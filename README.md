@@ -1,6 +1,6 @@
 # excelRio 
 
-Excel - R Input - Output
+Excel-R Input-Output
 
 excelRio is an R package providing rudimentary input/output capability
 between Microsoft Excel and R via:
@@ -10,7 +10,8 @@ between Microsoft Excel and R via:
 - directly to workbooks
 
 In contraposition to RExcel, excelRio assumes the user "lives" within the R environment
-and sometimes uses Excel as a source of data or to store results.
+and sometimes uses Excel as a source of data or to store results,
+either for printing reports or performing subsequent analysis.
 
 ## Installation
 
@@ -23,8 +24,9 @@ install.packages(c("tools", "mondate"))
 ```
 
 Those two packages are sufficient to exchange data via the clipboard and csv files.
-To exchange data directly with workbooks it is recommended to also install the XLConnect package and it dependencies.
-Note that XLConnect uses java and the rJava package, which can sometimes be troublesome to manage. Please consult your IT department.
+To exchange data directly with workbooks it is recommended to also install the XLConnect package and its dependencies.
+Other packages are supported. See the help for `readFromExcel` and `writeToExcel`.
+**Note! XLConnect uses java and the rJava package, which can sometimes be troublesome to manage. Please consult your IT department.**
 
 To install excelRio run:
 ```s

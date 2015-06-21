@@ -1,5 +1,5 @@
 # readFromCsv.r
-##    Copyright (C) <2012 - 2014>  <Daniel Murphy>
+##    Copyright (C) <2012 - 2015>  <Daniel Murphy>
 
 #    This file is part of excelRio.
 #
@@ -32,11 +32,14 @@ readFromCsv <- function(file,
     return(NULL)
     }
 #  require(tools, quietly = TRUE)
-  ext <- file_ext(file)
-  if (tolower(ext) != "csv") {
-    warning("Only csv files can be read with readFromCsv.")
-    return(character(0))
-    }
+# 6/21/15: Remove check of csv extension
+#     Also, note that I can't remember why 'require(tools ...' was commented out previously,
+#           as it also is in readFromExcel
+#  ext <- file_ext(file)
+#  if (tolower(ext) != "csv") {
+#    warning("Only csv files can be read with readFromCsv.")
+#    return(character(0))
+#    }
   if (rowheader) row.names = 1
   else row.names = NULL
   x <- read.csv(file, header = header, row.names = row.names, stringsAsFactors = stringsAsFactors, na.strings = na.strings, ...)

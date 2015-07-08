@@ -50,27 +50,29 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
   if (length(startCol) > 1L) stop("startCol must have length 1")
 
 #  require(tools, quietly = TRUE)
-  if (file_ext(file) == "") file <- paste(file, "xlsx", sep = ".")
+  if (tools::file_ext(file) == "") file <- paste(file, "xlsx", sep = ".")
   file_exists <- !is.na(file.info(file)$size)
 
   res <- if (pkg == "XLConnect") {
     maxSheetVersion <- 6
-    pkg.exists <- suppressPackageStartupMessages(require(XLConnect, warn.conflicts = FALSE, quietly = TRUE))
+#    pkg.exists <- suppressPackageStartupMessages(require(XLConnect, warn.conflicts = FALSE, quietly = TRUE))
+#    pkg.exists <- suppressPackageStartupMessages(requireNamespace(XLConnect, quietly = TRUE))
+    pkg.exists <- TRUE
     if (!pkg.exists) stop("XLConnect package is not installed. Data not saved")
     if (file_exists) {
       step <- "loading"
       res <- wb <- tryCatch(XLConnect::loadWorkbook(file, create = FALSE), error = function(x) x)
       if (class(res)[1] != "workbook") {
-        stop("Excel file '", file_path_as_absolute(file), "' already exists but cannot be loaded. Corrupt?\n", sep = "")
+        stop("Excel file '", tools::file_path_as_absolute(file), "' already exists but cannot be loaded. Corrupt?\n", sep = "")
         # return(FALSE) # couldn't load for some reason -- see warning at console
         }
       # Let's see if the sheet exists
       if (missing(sheet)) {
-        shts <- getSheets(wb)
+        shts <- XLConnect::getSheets(wb)
         sheet <- paste("Sheet", length(shts)+1, sep = "")
         }
       else
-      if (existsSheet(wb, name = sheet)) {
+      if (XLConnect::existsSheet(wb, name = sheet)) {
         if (overwrite == "FALSE") {
           res <- simpleError(paste("\a Sheet '", sheet, "' exists in file '", file, "', no overwrite requested. Data not saved.\n", sep = ""))
           return(FALSE)
@@ -81,7 +83,7 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
           originalSheet <- sheet
           for (i in 1:maxSheetVersion) { # look for first nonexistent incremental name
             sheet <- sprintf("%s(%i)", originalSheet, i)
-            foundi <- !existsSheet(wb, name = sheet)
+            foundi <- !XLConnect::existsSheet(wb, name = sheet)
             if (foundi) break
             }
           if (!foundi) stop("\a Max sheet version'", sheet, " already exists in file '", file, "'. Data not saved.\n", sep = "")
@@ -98,7 +100,9 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
         rowheader = rowheader)
     }
   else {
-    pkg.exists <- suppressPackageStartupMessages(require(WriteXLS, warn.conflicts = FALSE, quietly = TRUE))
+#    pkg.exists <- suppressPackageStartupMessages(require(WriteXLS, warn.conflicts = FALSE, quietly = TRUE))
+#    pkg.exists <- suppressPackageStartupMessages(requireNamespace(WriteXLS, quietly = TRUE))
+    pkg.exists <- TRUE
     if (!pkg.exists) stop("WriteXLS package is not installed. Data not saved")
     if (!is.character(data)) data <- deparse(substitute(data))
     if (length(data) > 1L) stop("'data' must have length 1")
@@ -118,7 +122,7 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
       ...)
     
     }
-  if (res) paste(file_path_as_absolute(file), sheet, sep = ":")
+  if (res) paste(tools::file_path_as_absolute(file), sheet, sep = ":")
   else "Save Failed"
   }
 
@@ -170,13 +174,13 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
   #           Date: Tue, 17 Jun 2014 17:11:14 -0400
   #           From: jim holtman <jholtman@gmail.com>
   #           To: R R-help <r-help@stat.math.ethz.ch>
-  res <- tryCatch(writeWorksheet(wb, outdata, sheet = sheet, startRow = startRow, startCol = startCol, header = header), error = function(x) x)
+  res <- tryCatch(XLConnect::writeWorksheet(wb, outdata, sheet = sheet, startRow = startRow, startCol = startCol, header = header), error = function(x) x)
   if (!is.null(res)) {
     wb <- NULL
     return(FALSE)
     }
   # Save the file
-  res <- tryCatch(saveWorkbook(wb), error = function(x) x)
+  res <- tryCatch(XLConnect::saveWorkbook(wb), error = function(x) x)
   wb <- NULL
   return(TRUE)
   }
@@ -184,8 +188,8 @@ writeToExcel <- function(data, file = deparse(substitute(data)),
 .writeToExcel.WriteXLS <- function(data, file, sheet, 
                                    header, rowheader, 
                                    envir, ...) {
-  require(WriteXLS)
-  WriteXLS(x = data,
+  #require(WriteXLS)
+  WriteXLS::WriteXLS(x = data,
            ExcelFileName = file,
            SheetNames = sheet,
            row.names = rowheader,

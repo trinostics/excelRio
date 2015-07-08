@@ -34,7 +34,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
       return(file)
     }
 #  require(tools, quietly = TRUE)
-  ext <- tolower(file_ext(file))
+  ext <- tolower(tools::file_ext(file))
   if (!(ext %in% c("xls", "xlsx", "xlsm", ""))) {
     cat(file, "' is not a supported Excel file\n", sep = "")
     return(NULL)
@@ -52,7 +52,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
   # If XLConnect is an installed package, we'll try that first.
   if (pkg == "XLConnect") {
     if ("XLConnect" %in% installed.packages()[,1]) {
-      res <- suppressPackageStartupMessages(require(XLConnect, warn.conflicts = FALSE, quietly = TRUE))
+#      res <- suppressPackageStartupMessages(require(XLConnect, warn.conflicts = FALSE, quietly = TRUE))
 
       res <- wb <- tryCatch(XLConnect::loadWorkbook(file, create = FALSE), error = function(e) e)
       if (class(res)[1L] != "workbook") {
@@ -75,7 +75,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
         }
       # rownames doesn't seem to work as expected in the next line, so commented out
       #x <- tryCatch(readWorksheet(object = wb, sheet = sheet, header = header, rownames = if (rowheader) 1 else NULL), error = function(x) x)
-      x <- tryCatch(readWorksheet(object = wb, sheet = sheet, header = header, rownames = NULL, ...), error = function(x) x)
+      x <- tryCatch(XLConnect::readWorksheet(object = wb, sheet = sheet, header = header, rownames = NULL, ...), error = function(x) x)
       if ("error" %in% class(x)) stop("Problem reading '", file, "', sheet '", sheet, "' with XLConnect package.")
       if (rowheader) {
         row.names(x) <- x[[1]]
@@ -156,9 +156,9 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
     if ("RODBC" %in% installed.packages()[,1]) {
       # if (R.Version()$arch != "i386") stop("Regretably, RODBC only works in 32 bit R.")
       # Actually, it's more complicated. Depends on installed version of excel.
-      res <- suppressPackageStartupMessages(require(RODBC, warn.conflicts = FALSE, quietly = TRUE))
+#      res <- suppressPackageStartupMessages(require(RODBC, warn.conflicts = FALSE, quietly = TRUE))
       
-      channel <- tryCatch(if (ext == "xls") odbcConnectExcel(file) else odbcConnectExcel2007(file), error = function(x) x)
+      channel <- tryCatch(if (ext == "xls") RODBC::odbcConnectExcel(file) else RODBC::odbcConnectExcel2007(file), error = function(x) x)
       if (class(channel) != "RODBC") stop("Problem trying to connect to workbook '", file, 
         "' with RODBC package.\n\nCan happen when\n", 
         "1. the Excel file is currently open\n", 
@@ -167,7 +167,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
   
       # Define getSheets and existsSheet functions for RODBC
       getSheets <- function() {
-        xltbls <- sqlTables(channel)
+        xltbls <- RODBC::sqlTables(channel)
         shts <- xltbls$TABLE_NAME[grep("\\$", xltbls$TABLE_NAME)]
         if (length(shts) == 0) stop("No sheets for RODBC to read!")
         # Get rid of the dollar sign at the end of the name that signifies that this excel "table" is a sheet
@@ -181,7 +181,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
         shts <- getSheets()
         if (sheet > length(shts)) {
           cat("You asked for sheet number ", sheet, " but there are only ", length(shts), " sheets in file '", file, "'\n", sep = "")
-          odbcClose(channel)
+          RODBC::odbcClose(channel)
           return(NULL)
           }
         # Keep fingers crossed that the sheet # user asks for is the one RODBC returns
@@ -190,7 +190,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
       else
       if (!existsSheet(sheet)) {
         cat("Read failed. Sheet '", sheet, "' does not exist in file '", file, "'\n", sep = "")
-        odbcClose(channel)
+        RODBC::odbcClose(channel)
         return(NULL)
         }
   
@@ -199,8 +199,8 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
       #   makes sense or, if not, making its own column names
       # 'rownames' argument doesn't seem to work as expected in the next line, so commented out
       #x <- tryCatch(sqlFetch(channel, sheet, stringsAsFactors = stringsAsFactors, na.strings = na.strings, ..., colnames = FALSE, rownames = rowheader), error = function(e) e)
-      x <- tryCatch(sqlFetch(channel, sheet, stringsAsFactors = stringsAsFactors, na.strings = na.strings, ..., colnames = FALSE, rownames = FALSE), error = function(e) e)
-      odbcClose(channel)
+      x <- tryCatch(RODBC::sqlFetch(channel, sheet, stringsAsFactors = stringsAsFactors, na.strings = na.strings, ..., colnames = FALSE, rownames = FALSE), error = function(e) e)
+      RODBC::odbcClose(channel)
       if ("error" %in% class(x)) stop("Problem reading '", file, "', sheet '", sheet, "' with RODBC package. File currently open in Excel?")
       if (rowheader) {
         row.names(x) <- x[[1]]
@@ -218,9 +218,9 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
 
   # last resort is the xlsx package   
   if (all(c("rJava", "xlsx") %in% installed.packages()[,1])) {
-    require(rJava, warn.conflicts = FALSE, quietly = TRUE)
-    require(xlsx, warn.conflicts = FALSE, quietly = TRUE)
-    res <- wb <- tryCatch(loadWorkbook(file), error = function(x) x)
+#    require(rJava, warn.conflicts = FALSE, quietly = TRUE)
+#    require(xlsx, warn.conflicts = FALSE, quietly = TRUE)
+    res <- wb <- tryCatch(xlsx::loadWorkbook(file), error = function(x) x)
     if (class(res) != "jobjRef") stop("Problem trying to load workbook '", file, "' with gdata package.")
 
     # Define existsSheet function for xlsx
@@ -228,7 +228,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
 
     # Let's see if the sheet exists
     if (is.numeric(sheet)) {
-      shts <- names(getSheets(wb))
+      shts <- names(xlsx::getSheets(wb))
       if (sheet > length(shts)) {
         cat("You asked for sheet number ", sheet, " but there are only ", length(shts), " sheets in file '", file, "'\n", sep = "")
         return(NULL)
@@ -236,12 +236,12 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
       sheet <- shts[sheet] # store the name of the sheet instead of the sheet #
       }
     else
-    if (!existsSheet(sheet)) {
+    if (!xlsx::existsSheet(sheet)) {
       cat("Read failed. Sheet '", sheet, "' does not exist in file '", file, "'\n", sep = "")
       return(NULL)
       }
     wb <- NULL # destroy utility variable
-    x <- tryCatch(read.xlsx(file = file, sheetName = sheet, rowIndex=NULL,
+    x <- tryCatch(xlsx::read.xlsx(file = file, sheetName = sheet, rowIndex=NULL,
           colIndex=NULL, as.data.frame=TRUE, header=header, colClasses=NA,
           keepFormulas=FALSE, encoding="unknown", stringsAsFactors = stringsAsFactors, ...), 
        error = function(x) x)

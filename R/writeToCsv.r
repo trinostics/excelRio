@@ -24,7 +24,7 @@ writeToCsv <- function(data, file = deparse(substitute(data)),
     if (!header) stop("R requires headers for all csv files. Attempt to set header = FALSE invalid.")
   overwrite <- match.arg(as.character(overwrite), c("TRUE", "FALSE", "version"))
 #  require(tools, quietly = TRUE)
-  fe <- file_ext(file)
+  fe <- tools::file_ext(file)
   if (fe == "") file <- paste(file, "csv", sep = ".")
   else
   if (fe != "csv") warn <- warning("data written to non-csv extension")
@@ -56,6 +56,6 @@ writeToCsv <- function(data, file = deparse(substitute(data)),
   # If unsuccessful, res will be an "error".
   res <- tryCatch(write.csv(outdata, file = file, row.names = FALSE, na = na, ...), error = function(e) e)
   if ("error" %in% class(res)) warning("Save unsuccessful. File currently open? Invalid filename?")
-  else file_path_as_absolute(file)
+  else tools::file_path_as_absolute(file)
   }
 

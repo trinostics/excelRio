@@ -1,15 +1,13 @@
 Package: excelRio
 Type: Package
 Title: Excel R Input Output
-Version: 0.1-1
-Date: 2014-10-07
+Version: 0.1.1001
+Date: 2015-06-21
 Author: Dan Murphy
 Maintainer: Dan Murphy <danielmarkmurphy@gmail.com>
 Description: Exchange data between R and Excel directly, and via the clipboard and csv files.
-Depends:
-    tools
 Imports:
-    mondate
+    mondate, tools
 Suggests:
     XLConnect, WriteXLS, RODBC, xlsx, rJava
 License: GPL (>= 2)

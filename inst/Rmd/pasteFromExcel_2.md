@@ -2,7 +2,7 @@
 title: "pasteFromExcel"
 author: "Dan Murphy"
 date: "Sunday, October 19, 2014"
-output: html_document
+output: md_document
 ---
 
 Suppose you have a triangle in Excel that you would like to analyze in R. In Excel, select the cells comprising the triangle *including the labels identifying accident year and age* and copy to the clipboard.

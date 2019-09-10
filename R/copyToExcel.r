@@ -16,26 +16,29 @@
 #    You should have received a copy of the GNU General Public License
 #    along with excelRio.  If not, see <http://www.gnu.org/licenses/>.
     
-copyToExcel <- function(x, rowheader = TRUE, header = TRUE, na = "", ...) {
+copyToExcel <- function(x, rowheader = TRUE, header = TRUE, 
+                        na = "", ...) {
   y <- as.data.frame(x)
   if (is.vector(x)) {
     names(y) <- deparse(substitute(x))
     if (missing(rowheader)) rowheader <- !is.null(names(x))
-    }
-  switch(Sys.info()["sysname"],
-    Windows = write.table(y, file = "clipboard", sep = "\t", na = na,
-                          row.names = rowheader, 
-                          col.names = if (rowheader && header) NA else header, 
-                          ...),
-    Darwin = {
-      clip <- pipe("pbcopy", "w")
-      write.table(y, file = clip, sep = "\t", na = na, 
-                  row.names = rowheader, 
-                  col.names = if (rowheader && header) NA else header, 
-                  ...)
-      close(clip)
-      },
-    stop("unsupported OS")
-    )
   }
+  switch(Sys.info()["sysname"],
+         Windows = write.table(y, file = "clipboard", 
+                               sep = "\t", 
+                               row.names = rowheader, 
+                               col.names = if (rowheader && header) NA else header, 
+                               na = na, ...),
+         Darwin = {
+           clip <- pipe("pbcopy", "w")
+           write.table(y, file = clip, 
+                       sep = "\t", 
+                       row.names = rowheader, 
+                       col.names = if (rowheader && header) NA else header, 
+                       na = na, ...)
+           close(clip)
+         },
+         stop("unsupported OS")
+  )
+}
 

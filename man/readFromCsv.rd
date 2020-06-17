@@ -11,7 +11,7 @@ read that data into an \R variable.
 readFromCsv(file, 
   stringsAsFactors = default.stringsAsFactors(),
   simplify = TRUE, drop = TRUE, 
-  na.strings = c("NA","#DIV/0!"), zero.strings = "-",  
+  na.strings = c("", "NA", "#DIV/0!"), zero.strings = "-",  
   convertFormattedNumbers = TRUE, \dots, header = TRUE, rowheader = FALSE)
 }
 \arguments{

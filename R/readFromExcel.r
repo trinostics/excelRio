@@ -19,7 +19,7 @@
 readFromExcel <- function(file = choose.files(), sheet = 1, 
   stringsAsFactors = default.stringsAsFactors(),
   simplify = TRUE, drop = TRUE, 
-  na.strings=c("NA","#DIV/0!"), 
+  na.strings=c("", "NA", "#DIV/0!"), 
   zero.strings = "-", 
   convertFormattedNumbers = TRUE, ..., 
   header = TRUE, rowheader = FALSE, 
@@ -236,7 +236,7 @@ readFromExcel <- function(file = choose.files(), sheet = 1,
       sheet <- shts[sheet] # store the name of the sheet instead of the sheet #
       }
     else
-    if (!xlsx::existsSheet(sheet)) {
+    if (!XLConnect::existsSheet(sheet)) {
       cat("Read failed. Sheet '", sheet, "' does not exist in file '", file, "'\n", sep = "")
       return(NULL)
       }

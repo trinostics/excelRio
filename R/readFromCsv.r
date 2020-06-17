@@ -19,8 +19,8 @@
 readFromCsv <- function(file, 
   stringsAsFactors = default.stringsAsFactors(),
   simplify = TRUE, drop = TRUE, 
-  na.strings = c("NA","#DIV/0!"),
-  zero.strings = c("-", ""),  
+  na.strings = c("", "NA", "#DIV/0!"),
+  zero.strings = "-",
   convertFormattedNumbers = TRUE, ..., header = TRUE, rowheader = FALSE) {
   if (missing(file)) {
     file <- choose.files()

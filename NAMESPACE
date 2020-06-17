@@ -1,4 +1,11 @@
 import(mondate)
+importFrom(utils, write.table)
+importFrom(utils, read.delim)
+importFrom(utils, read.csv)
+importFrom(utils, write.csv)
+importFrom(utils, choose.files)
+importFrom(utils, installed.packages)
+importFrom(XLConnect, existsSheet)
 export(
     pasteFromExcel,
     copyToExcel,

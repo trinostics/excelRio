@@ -9,7 +9,7 @@ read data from an excel sheet into an \R variable.
 readFromExcel(file = choose.files(), sheet = 1,
   stringsAsFactors = default.stringsAsFactors(),
   simplify = TRUE, drop = TRUE, 
-  na.strings = c("NA","#DIV/0!"), 
+  na.strings = c("", "NA", "#DIV/0!"), 
   zero.strings = "-",  
   convertFormattedNumbers = TRUE, \dots, 
   header = TRUE, rowheader = FALSE,

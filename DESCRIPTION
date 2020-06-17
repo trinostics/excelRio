@@ -7,7 +7,7 @@ Author: Dan Murphy
 Maintainer: Dan Murphy <danielmarkmurphy@gmail.com>
 Description: Exchange data between R and Excel directly, and via the clipboard and csv files.
 Imports:
-    mondate, tools
+    mondate, xlsx, utils, XLConnect, RODBC
 Suggests:
-    XLConnect, WriteXLS, RODBC, xlsx, rJava
+    WriteXLS
 License: GPL (>= 2)
